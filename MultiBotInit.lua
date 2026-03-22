@@ -1109,6 +1109,11 @@ tMain.addButton("Actions", 0, 374, "inv_helmet_02", MultiBot.tips.main.action)
 	MultiBot.ActionToTargetOrGroup("reset")
 end
 
+tMain.addButton("Leader", 0, 408, "Interface\\AddOns\\MultiBot\\Icons\\invite.blp", MultiBot.tips.main.leader)
+.doLeft = function(pButton)
+	MultiBot.ActionToGroup("give leader")
+end
+
 -- GAMEMASTER --
 
 local tButton = tMultiBar.addButton("Masters", 38, 0, "mail_gmicon", MultiBot.tips.game.master).doHide()
