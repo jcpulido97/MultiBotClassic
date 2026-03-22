@@ -167,8 +167,10 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
+	pFrame.nextX = -120
+
 	-- STRATEGIES --
-	
+
 	if(MultiBot.isInside(pCombat, "dps,")) then pFrame.getButton("Dps").setEnable() end
 	if(MultiBot.isInside(pCombat, "dps aoe")) then pFrame.getButton("DpsAoe").setEnable() end
 	if(MultiBot.isInside(pCombat, "dps assist")) then pFrame.getButton("DpsAssist").setEnable() end

@@ -319,8 +319,10 @@ MultiBot.addPaladin = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
+	pFrame.nextX = -210
+
 	-- STRATEGIES --
-	
+
 	if(MultiBot.isInside(pCombat, "dps,")) then pFrame.getButton("Dps").setEnable() end
 	if(MultiBot.isInside(pCombat, "heal")) then pFrame.getButton("Heal").setEnable() end
 	if(MultiBot.isInside(pCombat, "tank,")) then pFrame.getButton("Tank").setEnable() end

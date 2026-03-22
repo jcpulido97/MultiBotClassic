@@ -155,8 +155,10 @@ MultiBot.addDruid = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
+	pFrame.nextX = -180
+
 	-- STRATEGIES --
-	
+
 	if(MultiBot.isInside(pCombat, "heal")) then pFrame.getButton("Heal").setEnable() end
 	if(MultiBot.isInside(pNormal, "buff,")) then pFrame.getButton("Buff").setEnable() end
 	if(MultiBot.isInside(pCombat, "caster debuff")) then pFrame.getButton("CasterDebuff").setEnable() end

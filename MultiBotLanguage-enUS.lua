@@ -1,15 +1,14 @@
 if(GetLocale() == "enUS") then
 MultiBot.data.classes.input = {
-[1] = "DeathKnight",
-[2] = "Druid",
-[3] = "Hunter",
-[4] = "Mage",
-[5] = "Paladin",
-[6] = "Priest",
-[7] = "Rogue",
-[8] = "Shaman",
-[9] = "Warlock",
-[10] = "Warrior"
+[1] = "Druid",
+[2] = "Hunter",
+[3] = "Mage",
+[4] = "Paladin",
+[5] = "Priest",
+[6] = "Rogue",
+[7] = "Shaman",
+[8] = "Warlock",
+[9] = "Warrior"
 }
 
 -- INFO --
@@ -566,7 +565,7 @@ MultiBot.tips.beast.call =
 
 MultiBot.tips.creator.master = 
 "Creator-Control\n|cffffffff"..
-"With this Button you can create Random-Bots by Class.\n"..
+"With this Button you can create Random-Bots by Class or Role.\n"..
 "The default Limit is 40 Random-Bots per Account.\n"..
 "There is no command to delete them after use.\n"..
 "So invite them to your Friendlist for reuse.\n"..
@@ -632,6 +631,36 @@ MultiBot.tips.creator.deathknight =
 "Create-DeathKnight\n|cffffffff"..
 "This Button will create a Random-Bot as a DeathKnight.|r\n\n"..
 "|cffff0000Left-Click to create a DeathKnight|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.role =
+"Create-Role\n|cffffffff"..
+"This Button will open the role-based Random-Bot creation options.|r\n\n"..
+"|cffff0000Left-Click to show or hide role Options|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.tank =
+"Create-Tank\n|cffffffff"..
+"This Button will create a Random-Bot with the tank role.|r\n\n"..
+"|cffff0000Left-Click to create tank role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.healer =
+"Create-Healer\n|cffffffff"..
+"This Button will create a Random-Bot with the healer role.|r\n\n"..
+"|cffff0000Left-Click to create healer role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.dps =
+"Create-Dps\n|cffffffff"..
+"This Button will create a Random-Bot with the dps role.|r\n\n"..
+"|cffff0000Left-Click to create dps role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.ranged =
+"Create-Ranged\n|cffffffff"..
+"This Button will create a Random-Bot with the ranged dps role.|r\n\n"..
+"|cffff0000Left-Click to create ranged dps role|r\n"..
 "|cff999999(Execution-Order: System)|r";
 
 MultiBot.tips.creator.inspect =

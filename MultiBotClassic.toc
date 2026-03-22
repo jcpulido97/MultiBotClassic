@@ -1,0 +1,39 @@
+## Interface: 11402
+## Version: 2.0.0
+## Title: MultiBotClassic
+## Notes: User Interface for Playerbot (Classic Era)
+## Author: Nico Loebbert
+## SavedVariablesPerCharacter: MultiBotSave
+## SavedVariables: MultiBotGlobalSave
+
+MultiBot.lua
+MultiBotLanguage-deDE.lua
+MultiBotLanguage-enGB.lua
+MultiBotLanguage-enUS.lua
+MultiBotLanguage-frFR.lua
+MultiBotLanguage-zhCN.lua
+MultiBotLanguage-koKR.lua
+MultiBotLanguage-ruRU.lua
+MultiBotLanguage-esES.lua
+MultiBotEngine.lua
+MultiBotHandler.lua
+MultiBotDruid.lua
+MultiBotHunter.lua
+MultiBotMage.lua
+MultiBotPaladin.lua
+MultiBotPriest.lua
+MultiBotRogue.lua
+MultiBotShaman.lua
+MultiBotWarlock.lua
+MultiBotWarrior.lua
+MultiBotEvery.lua
+MultiBotStats.lua
+MultiBotSpell.lua
+MultiBotItem.lua
+MultiBotInit.lua
+MultiBotItemus.lua
+MultiBotIconos.lua
+MultiBotTalent.lua
+MultiBotReward.lua
+MultiBotNecronet.lua
+MultiBotRaidus.lua

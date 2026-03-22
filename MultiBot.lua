@@ -1,19 +1,52 @@
 MultiBot = CreateFrame("Frame", nil, UIParent)
-MultiBot:RegisterEvent("ADDON_LOADED")
-MultiBot:RegisterEvent("WORLD_MAP_UPDATE")
-MultiBot:RegisterEvent("PLAYER_ENTERING_WORLD")
-MultiBot:RegisterEvent("PLAYER_TARGET_CHANGED")
-MultiBot:RegisterEvent("PLAYER_LOGOUT")
-MultiBot:RegisterEvent("CHAT_MSG_WHISPER")
-MultiBot:RegisterEvent("CHAT_MSG_SYSTEM")
-MultiBot:RegisterEvent("CHAT_MSG_ADDON")
-MultiBot:RegisterEvent("CHAT_MSG_LOOT")
-MultiBot:RegisterEvent("QUEST_COMPLETE")
-MultiBot:RegisterEvent("QUEST_LOG_UPDATE")
-MultiBot:RegisterEvent("TRADE_CLOSED")
+
+local function MultiBotRegisterEvent(pEvent)
+	local tSuccess = pcall(function() MultiBot:RegisterEvent(pEvent) end)
+	return tSuccess
+end
+
+MultiBotRegisterEvent("ADDON_LOADED")
+MultiBotRegisterEvent("PLAYER_ENTERING_WORLD")
+MultiBotRegisterEvent("GROUP_ROSTER_UPDATE")
+MultiBotRegisterEvent("RAID_ROSTER_UPDATE")
+MultiBotRegisterEvent("PARTY_MEMBERS_CHANGED")
+MultiBotRegisterEvent("PLAYER_TARGET_CHANGED")
+MultiBotRegisterEvent("PLAYER_LOGOUT")
+MultiBotRegisterEvent("CHAT_MSG_WHISPER")
+MultiBotRegisterEvent("CHAT_MSG_SYSTEM")
+MultiBotRegisterEvent("CHAT_MSG_ADDON")
+MultiBotRegisterEvent("CHAT_MSG_LOOT")
+MultiBotRegisterEvent("QUEST_COMPLETE")
+MultiBotRegisterEvent("QUEST_LOG_UPDATE")
+MultiBotRegisterEvent("TRADE_CLOSED")
+
+if(MultiBotRegisterEvent("WORLD_MAP_UPDATE") == false) then
+	MultiBotRegisterEvent("ZONE_CHANGED")
+	MultiBotRegisterEvent("ZONE_CHANGED_INDOORS")
+	MultiBotRegisterEvent("ZONE_CHANGED_NEW_AREA")
+end
+
 MultiBot:SetPoint("BOTTOMRIGHT", 0, 0)
 MultiBot:SetSize(1, 1)
 MultiBot:Show()
+
+if(GetNumRaidMembers == nil) then
+	GetNumRaidMembers = function()
+		if(IsInRaid ~= nil and IsInRaid()) then return GetNumGroupMembers() end
+		return 0
+	end
+end
+
+if(GetNumPartyMembers == nil) then
+	GetNumPartyMembers = function()
+		if(IsInGroup ~= nil and IsInGroup() and (IsInRaid == nil or IsInRaid() == false)) then
+			local tMembers = GetNumGroupMembers() - 1
+			if(tMembers < 0) then return 0 end
+			return tMembers
+		end
+		return 0
+	end
+end
 
 MultiBotSave = {}
 MultiBotGlobalSave = {}
@@ -33,6 +66,56 @@ MultiBot.spells = {}
 MultiBot.frames = {}
 MultiBot.units = {}
 MultiBot.tips = {}
+MultiBot.path = "Interface\\AddOns\\MultiBotClassic\\"
+MultiBot.player = {}
+MultiBot.textureRemaps = {
+	["inv_misc_grouplooking"] = "Interface\\RaidFrame\\ReadyCheck-NotReady",
+	["inv_misc_groupneedmore"] = "Interface\\RaidFrame\\ReadyCheck-Ready",
+	["inv_drink_24_sealwhey"] = "inv_misc_food_15",
+	["inv_misc_coin_16"] = "inv_misc_coin_01",
+	["achievement_reputation_01"] = "inv_misc_gift_01",
+	["spell_shadow_demonicempathy"] = "spell_shadow_shadowwordpain",
+	["spell_arcane_arcanetorrent"] = "spell_shadow_psychicscream",
+	["spell_holy_heroism"] = "spell_holy_sealofsalvation",
+	["spell_holy_surgeoflight"] = "spell_holy_holysmite",
+	["spell_holy_divinepurpose"] = "spell_shadow_shadowform",
+	["spell_holy_aspiration"] = "spell_holy_heal",
+}
+
+MultiBot.resolveTexture = function(pTexture)
+	if(pTexture == nil) then return nil end
+	if(type(pTexture) == "number") then return pTexture end
+
+	local tTexture = tostring(pTexture)
+	local tNumeric = tonumber(tTexture)
+	if(tNumeric ~= nil) then return tNumeric end
+
+	tTexture = string.gsub(tTexture, "%.$", "")
+	tTexture = string.gsub(tTexture, "%s+_", "_")
+	tTexture = string.gsub(tTexture, "_%s+", "_")
+	tTexture = string.gsub(tTexture, "Interface\\AddOns\\MultiBot\\", MultiBot.path)
+	tTexture = string.gsub(tTexture, "Interface/AddOns/MultiBot/", string.gsub(MultiBot.path, "\\", "/"))
+
+	local tLookup = string.lower(string.gsub(tTexture, "/", "\\"))
+	tLookup = string.gsub(tLookup, "^interface\\icons\\", "")
+	if(MultiBot.textureRemaps[tLookup] ~= nil) then
+		tTexture = MultiBot.textureRemaps[tLookup]
+	end
+
+	if(string.sub(tTexture, 1, 6) == "Icons\\" or string.sub(tTexture, 1, 6) == "Icons/") then
+		return MultiBot.path .. string.gsub(tTexture, "/", "\\")
+	end
+
+	if(string.sub(tTexture, 1, 9) == "Textures\\" or string.sub(tTexture, 1, 9) == "Textures/") then
+		return MultiBot.path .. string.gsub(tTexture, "/", "\\")
+	end
+
+	if(string.sub(tTexture, 1, 9) == "Interface" or string.sub(tTexture, 1, 5) == "Fonts") then
+		return tTexture
+	end
+
+	return "Interface\\Icons\\" .. string.gsub(tTexture, "/", "\\")
+end
 
 MultiBot.auto = {}
 MultiBot.auto.sort = false
@@ -60,29 +143,27 @@ MultiBot.timer.invite.interval = 5
 
 MultiBot.data.classes = {}
 MultiBot.data.classes.input = {
-[1] = "DeathKnight",
-[2] = "Druid",
-[3] = "Hunter",
-[4] = "Mage",
-[5] = "Paladin",
-[6] = "Priest",
-[7] = "Rogue",
-[8] = "Shaman",
-[9] = "Warlock",
-[10] = "Warrior"
+[1] = "Druid",
+[2] = "Hunter",
+[3] = "Mage",
+[4] = "Paladin",
+[5] = "Priest",
+[6] = "Rogue",
+[7] = "Shaman",
+[8] = "Warlock",
+[9] = "Warrior"
 }
 
 MultiBot.data.classes.output = {
-[1] = "DeathKnight",
-[2] = "Druid",
-[3] = "Hunter",
-[4] = "Mage",
-[5] = "Paladin",
-[6] = "Priest",
-[7] = "Rogue",
-[8] = "Shaman",
-[9] = "Warlock",
-[10] = "Warrior"
+[1] = "Druid",
+[2] = "Hunter",
+[3] = "Mage",
+[4] = "Paladin",
+[5] = "Priest",
+[6] = "Rogue",
+[7] = "Shaman",
+[8] = "Warlock",
+[9] = "Warrior"
 }
 
 -- INFO --
@@ -212,15 +293,6 @@ MultiBot.info.talent.Title =
 
 MultiBot.info.talent.Points =
 "|cffffcc00Unspent Talents: |r";
-
-MultiBot.info.talent.DeathKnight1 =
-"|cffffcc00Blood|r";
-
-MultiBot.info.talent.DeathKnight2 =
-"|cffffcc00Frost|r";
-
-MultiBot.info.talent.DeathKnight3 =
-"|cffffcc00Unholy|r";
 
 MultiBot.info.talent.Druid1 =
 "|cffffcc00Balance|r";
@@ -656,7 +728,7 @@ MultiBot.tips.beast.call =
 MultiBot.tips.creator = {}
 MultiBot.tips.creator.master = 
 "Creator-Control\n|cffffffff"..
-"With this Control you can create Random-Bots by Class.\n"..
+"With this Control you can create Random-Bots by Class or Role.\n"..
 "The default Limit is 40 Random-Bots per Account.\n"..
 "There is no command to delete them after use.\n"..
 "So invite them to your Friendlist for reuse.\n"..
@@ -718,10 +790,34 @@ MultiBot.tips.creator.druid =
 "|cffff0000Left-Click to create Druid|r\n"..
 "|cff999999(Execution-Order: System)|r";
 
-MultiBot.tips.creator.deathknight =
-"Create-DeathKnight\n|cffffffff"..
-"This Button will create a Random-Bot as DeathKnight.|r\n\n"..
-"|cffff0000Left-Click to create DeathKnight|r\n"..
+MultiBot.tips.creator.role =
+"Create-Role\n|cffffffff"..
+"This Button will open the role-based Random-Bot creation options.|r\n\n"..
+"|cffff0000Left-Click to show or hide role Options|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.tank =
+"Create-Tank\n|cffffffff"..
+"This Button will create a Random-Bot with the tank role.|r\n\n"..
+"|cffff0000Left-Click to create tank role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.healer =
+"Create-Healer\n|cffffffff"..
+"This Button will create a Random-Bot with the healer role.|r\n\n"..
+"|cffff0000Left-Click to create healer role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.dps =
+"Create-Dps\n|cffffffff"..
+"This Button will create a Random-Bot with the dps role.|r\n\n"..
+"|cffff0000Left-Click to create dps role|r\n"..
+"|cff999999(Execution-Order: System)|r";
+
+MultiBot.tips.creator.ranged =
+"Create-Ranged\n|cffffffff"..
+"This Button will create a Random-Bot with the ranged dps role.|r\n\n"..
+"|cffff0000Left-Click to create ranged dps role|r\n"..
 "|cff999999(Execution-Order: System)|r";
 
 MultiBot.tips.creator.inspect =

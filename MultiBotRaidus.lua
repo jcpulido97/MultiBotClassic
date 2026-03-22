@@ -30,37 +30,48 @@ end
 MultiBot.raidus.wowButton("Load", -762, 360, 80, 20, 12)
 .doLeft = function(pButton)
 	local tPool = MultiBot.raidus.frames["Pool"]
+	if(MultiBot.raidus.save == nil or MultiBot.raidus.save == "") then
+		SendChatMessage(MultiBot.info.nothing, "SAY");
+		return
+	end
+
 	local tData = MultiBotSave["Raidus" .. MultiBot.raidus.save]
 	
 	if(tData == nil or tData == "") then
 		SendChatMessage(MultiBot.info.nothing, "SAY");
+		return
 	end
 	
 	local tLoad = MultiBot.doSplit(tData, ";")
 	
 	for i = 1, 8, 1 do
-		local tGroup = MultiBot.doSplit(tLoad[i], ",")
+		local tGroup = nil
+		if(tLoad[i] ~= nil and tLoad[i] ~= "") then
+			tGroup = MultiBot.doSplit(tLoad[i], ",")
+		end
 		
-		for j = 1, 5, 1 do
-			local tDrop = MultiBot.raidus.frames["Group" .. i].frames["Slot" .. j]
-			local tName = tGroup[j]
-			
-			if(tName ~= "-") then
-				for tIndex, tDrag in pairs(tPool.frames) do
-					if(tDrag.name ~= nil and tDrag.name == tName) then
-						local tVisible = tDrag:IsVisible()
-						local tParent = tDrag.parent
-						local tHeight = tDrag.height
-						local tWidth = tDrag.width
-						local tSlot = tDrag.slot
-						local tX = tDrag.x
-						local tY = tDrag.y
-						
-						MultiBot.raidus.doDrop(tDrag, tDrop.parent, tDrop.x, tDrop.y, tDrop.width, tDrop.height, tDrop.slot)
-						if(tDrop:IsVisible()) then tDrag:Show() else tDrag:Hide() end
-						
-						MultiBot.raidus.doDrop(tDrop, tParent, tX, tY, tWidth, tHeight, tSlot)
-						if(tVisible) then tDrop:Show() else tDrop:Hide() end
+		if(tGroup ~= nil) then
+			for j = 1, 5, 1 do
+				local tDrop = MultiBot.raidus.frames["Group" .. i].frames["Slot" .. j]
+				local tName = tGroup[j]
+				
+				if(tName ~= nil and tName ~= "-") then
+					for tIndex, tDrag in pairs(tPool.frames) do
+						if(tDrag.name ~= nil and tDrag.name == tName) then
+							local tVisible = tDrag:IsVisible()
+							local tParent = tDrag.parent
+							local tHeight = tDrag.height
+							local tWidth = tDrag.width
+							local tSlot = tDrag.slot
+							local tX = tDrag.x
+							local tY = tDrag.y
+							
+							MultiBot.raidus.doDrop(tDrag, tDrop.parent, tDrop.x, tDrop.y, tDrop.width, tDrop.height, tDrop.slot)
+							if(tDrop:IsVisible()) then tDrag:Show() else tDrag:Hide() end
+							
+							MultiBot.raidus.doDrop(tDrop, tParent, tX, tY, tWidth, tHeight, tSlot)
+							if(tVisible) then tDrop:Show() else tDrop:Hide() end
+						end
 					end
 				end
 			end
@@ -254,17 +265,16 @@ MultiBot.raidus.setRaidus = function()
 		local tClass = MultiBot.toClass(tBot.class)
 		
 		tBot.sort = tBot.level * 1000
-		+ MultiBot.IF(tClass == "DeathKnight", 1100000
-		, MultiBot.IF(tClass == "Druid", 1200000
-		, MultiBot.IF(tClass == "Hunter", 1300000
-		, MultiBot.IF(tClass == "Mage", 1400000
-		, MultiBot.IF(tClass == "Paladin", 1500000
-		, MultiBot.IF(tClass == "Priest", 1600000
-		, MultiBot.IF(tClass == "Rogue", 1700000
-		, MultiBot.IF(tClass == "Shaman", 1800000
-		, MultiBot.IF(tClass == "Warlock", 1900000
-		, MultiBot.IF(tClass == "Warrior", 2000000
-		, 1000000)))))))))) + tBot.score;
+		+ MultiBot.IF(tClass == "Druid", 1100000
+		, MultiBot.IF(tClass == "Hunter", 1200000
+		, MultiBot.IF(tClass == "Mage", 1300000
+		, MultiBot.IF(tClass == "Paladin", 1400000
+		, MultiBot.IF(tClass == "Priest", 1500000
+		, MultiBot.IF(tClass == "Rogue", 1600000
+		, MultiBot.IF(tClass == "Shaman", 1700000
+		, MultiBot.IF(tClass == "Warlock", 1800000
+		, MultiBot.IF(tClass == "Warrior", 1900000
+		, 1000000))))))))) + tBot.score;
 		
 		tBots[tIndex] = tBot
 		tIndex = tIndex + 1

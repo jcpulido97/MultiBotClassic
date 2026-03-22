@@ -2,8 +2,9 @@
 User interface for AzerothCore-Module "Playerbot" by Liyunfan1223.<br>
 Tested with American and German 3.3.5 Wotlk-Client.
 # Installation
-Simply place the files in a folder called "MultiBot" in your World of Warcraft AddOns directory.<br>
-Example: "C:\WorldOfWarcraft\Interface\AddOns\MultiBot"
+Place the files in your World of Warcraft AddOns directory in a folder whose name matches the TOC file.<br>
+For this package, keep the folder name as "MultiBotClassic" so WoW can detect "MultiBotClassic.toc".<br>
+Example: "C:\WorldOfWarcraft\Interface\AddOns\MultiBotClassic"
 # Use
 Start World of Warcraft and enter "/multibot" or "/mbot" or "/mb" in the chat.
 # Current Status

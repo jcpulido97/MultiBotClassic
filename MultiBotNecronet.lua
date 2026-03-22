@@ -565,21 +565,23 @@ MultiBot.necronet.index = {}
 MultiBot.necronet.buttons = {}
 MultiBot.necronet.state = false
 
-for key, value in pairs(MultiBot.data.necronet) do
-	if(MultiBot.necronet.index[value[1]] == nil) then MultiBot.necronet.index[value[1]] = {} end
-	if(MultiBot.necronet.index[value[1]][value[2]] == nil) then MultiBot.necronet.index[value[1]][value[2]] = {} end
-	
-	local tX = WorldMapButton:GetWidth() * value[4] / 100 - WorldMapButton:GetWidth() + 12
-	local tY = WorldMapButton:GetHeight() * -value[5] / 100 + WorldMapButton:GetHeight() - 12
-	
-	local tButton = MultiBot.newButton(WorldMapButton, tX, tY, 24, "achievement_bg_xkills_avgraveyard", key)
-	tButton.graveyard = key
-	tButton:Hide()
-	
-	tButton.doLeft = function(pButton)
-		MultiBot.doDot(".go graveyard", pButton.graveyard)
-	end
+if(WorldMapButton ~= nil) then
+	for key, value in pairs(MultiBot.data.necronet) do
+		if(MultiBot.necronet.index[value[1]] == nil) then MultiBot.necronet.index[value[1]] = {} end
+		if(MultiBot.necronet.index[value[1]][value[2]] == nil) then MultiBot.necronet.index[value[1]][value[2]] = {} end
+		
+		local tX = WorldMapButton:GetWidth() * value[4] / 100 - WorldMapButton:GetWidth() + 12
+		local tY = WorldMapButton:GetHeight() * -value[5] / 100 + WorldMapButton:GetHeight() - 12
+		
+		local tButton = MultiBot.newButton(WorldMapButton, tX, tY, 24, "achievement_bg_xkills_avgraveyard", key)
+		tButton.graveyard = key
+		tButton:Hide()
+		
+		tButton.doLeft = function(pButton)
+			MultiBot.doDot(".go graveyard", pButton.graveyard)
+		end
 
-	table.insert(MultiBot.necronet.index[value[1]][value[2]], tButton)
-	table.insert(MultiBot.necronet.buttons, tButton)
+		table.insert(MultiBot.necronet.index[value[1]][value[2]], tButton)
+		table.insert(MultiBot.necronet.buttons, tButton)
+	end
 end

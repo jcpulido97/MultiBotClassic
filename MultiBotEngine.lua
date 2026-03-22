@@ -194,11 +194,23 @@ MultiBot.isUnit = function(pUnit)
 	return true
 end
 
+MultiBot.GetQuestLink = function(pQuestLogIndex)
+	if(GetQuestLink ~= nil) then
+		return GetQuestLink(pQuestLogIndex)
+	end
+
+	local tTitle, tLevel, tGroup, tHeader, tCollapsed, tComplete, tFrequency, tQuestID = GetQuestLogTitle(pQuestLogIndex)
+	if(tTitle == nil) then return nil end
+	if(tQuestID == nil or tQuestID == 0) then return tTitle end
+	if(tLevel == nil or tLevel < 0) then tLevel = 0 end
+	return "|cffffff00|Hquest:" .. tQuestID .. ":" .. tLevel .. "|h[" .. tTitle .. "]|h|r"
+end
+
 MultiBot.toClass = function(pClass)
 	local pLower = string.lower(pClass)
 	local pStart = string.sub(pLower, 1, 5)
 	
-	for i = 1, 10 do
+	for i = 1, 9 do
 		local tOutput = MultiBot.data.classes.output[i]
 		local tInput = MultiBot.data.classes.input[i]
 		local tLower = string.lower(tInput)
@@ -210,7 +222,6 @@ MultiBot.toClass = function(pClass)
 	end
 	
 	local tClass = string.lower(string.sub(pClass, 1, 1) .. string.sub(pClass, 4, 4))
-	if(tClass == "te" or tClass == "dt") then return "DeathKnight" end
 	if(tClass == "di" or tClass == "di") then return "Druid" end
 	if(tClass == "jg" or tClass == "ht") then return "Hunter" end
 	if(tClass == "mi" or tClass == "me") then return "Mage" end
@@ -220,7 +231,6 @@ MultiBot.toClass = function(pClass)
 	if(tClass == "sa" or tClass == "sm") then return "Shaman" end
 	if(tClass == "he" or tClass == "wl") then return "Warlock" end
 	if(tClass == "ke" or tClass == "wr") then return "Warrior" end
-	if(pClass == "dk") then return "DeathKnight" end
 	return "Unknown"
 end
 
@@ -320,19 +330,18 @@ MultiBot.RaidPool = function(pUnit, oWho)
 end
 
 MultiBot.ItemLevel = function(pUnit)
-	local tTitan = IsSpellKnown(49152) -- Titan's Grip
 	local tCount = 16
 	local tScore = 0
-	
+
 	for i = 1, 18, 1 do
 		local tItem = GetInventoryItemLink(pUnit, i)
 		if(tItem ~= nil and i ~= 4) then
 			local iName, iLink, iRare, iLevel, iMinLevel, iType, iSubType, iStack, iEquipLoc = GetItemInfo(tItem)
-			if((i == 16 and iEquipLoc ~= "INVTYPE_2HWEAPON") or (i == 16 and tTitan) or (i == 17)) then tCount = 17 end
+			if((i == 16 and iEquipLoc ~= "INVTYPE_2HWEAPON") or (i == 17)) then tCount = 17 end
 			tScore = tScore + iLevel
 		end
 	end
-	
+
 	return floor(tScore / tCount), tCount
 end
 
@@ -541,7 +550,7 @@ MultiBot.newFrame = function(pParent, pX, pY, pSize, oWidth, oHeight, oAlign)
 	frame.addTexture = function(pTexture)
 		if(frame.texture ~= nil) then frame.texture:Hide() end
 		frame.texture = frame:CreateTexture(nil, "BACKGROUND")
-		frame.texture:SetTexture(MultiBot.IF(string.sub(pTexture, 1, 9) ~= "Interface", "Interface/Icons/", "") .. pTexture)
+		frame.texture:SetTexture(MultiBot.resolveTexture(pTexture))
 		frame.texture:SetAllPoints(frame)
 		frame.texture:Show()
 		return frame.texture
@@ -606,6 +615,7 @@ MultiBot.newFrame = function(pParent, pX, pY, pSize, oWidth, oHeight, oAlign)
 	-- SET --
 	
 	frame.setPoint = function(pX, pY)
+		frame:ClearAllPoints()
 		frame:SetPoint("BOTTOMRIGHT", pX, pY)
 		frame.x = pX
 		frame.y = pY
@@ -618,7 +628,7 @@ MultiBot.newFrame = function(pParent, pX, pY, pSize, oWidth, oHeight, oAlign)
 	end
 	
 	frame.setTexture = function(pTexture)
-		frame.texture:SetTexture(MultiBot.IF(string.sub(pTexture, 1, 9) ~= "Interface", "Interface/Icons/", "") .. pTexture)
+		frame.texture:SetTexture(MultiBot.resolveTexture(pTexture))
 		frame.texture:SetAllPoints(frame)
 		frame.texture:Show()
 		return frame
@@ -707,12 +717,12 @@ MultiBot.newButton = function(pParent, pX, pY, pSize, pTexture, pTip, oTemplate)
 	button:Show()
 	
 	button.icon = button:CreateTexture(nil, "BACKGROUND")
-	button.icon:SetTexture(MultiBot.IF(string.sub(pTexture, 1, 9) ~= "Interface", "Interface/Icons/", "") .. pTexture)
+	button.icon:SetTexture(MultiBot.resolveTexture(pTexture))
 	button.icon:SetAllPoints(button)
 	button.icon:Show()
 	
 	button.border = button:CreateTexture(nil, "ARTWORK")
-	button.border:SetTexture("Interface\\AddOns\\MultiBot\\Icons\\border.blp")
+	button.border:SetTexture(MultiBot.resolveTexture("Icons\\border.blp"))
 	button.border:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
 	button.border:SetSize(pSize + 4, pSize + 4)
 	button.border:Hide()
@@ -741,6 +751,7 @@ MultiBot.newButton = function(pParent, pX, pY, pSize, pTexture, pTip, oTemplate)
 	-- SET --
 	
 	button.setPoint = function(pX, pY)
+		button:ClearAllPoints()
 		button:SetPoint("BOTTOMRIGHT", pX, pY)
 		button.x = pX
 		button.y = pY
@@ -748,7 +759,7 @@ MultiBot.newButton = function(pParent, pX, pY, pSize, pTexture, pTip, oTemplate)
 	end
 	
 	button.setButton = function(pTexture, pTip)
-		button.icon:SetTexture(MultiBot.IF(string.sub(pTexture, 1, 9) ~= "Interface", "Interface/Icons/", "") .. pTexture)
+		button.icon:SetTexture(MultiBot.resolveTexture(pTexture))
 		button.icon:SetAllPoints(button)
 		button.texture = pTexture
 		button.tip = pTip
@@ -756,7 +767,7 @@ MultiBot.newButton = function(pParent, pX, pY, pSize, pTexture, pTip, oTemplate)
 	end
 	
 	button.setTexture = function(pTexture)
-		button.icon:SetTexture(MultiBot.IF(string.sub(pTexture, 1, 9) ~= "Interface", "Interface/Icons/", "") .. pTexture)
+		button.icon:SetTexture(MultiBot.resolveTexture(pTexture))
 		button.icon:SetAllPoints(button)
 		button.texture = pTexture
 		return button
@@ -921,13 +932,15 @@ MultiBot.wowButton = function(pParent, pName, pX, pY, pWidth, pHeight, pSize)
 	-- SET --
 	
 	button.setDisable = function()
-		button:GetNormalTexture():SetDesaturated(1)
+		local tTexture = button:GetNormalTexture()
+		if(tTexture ~= nil and tTexture.SetDesaturated ~= nil) then tTexture:SetDesaturated(1) end
 		button.state = false
 		return button
 	end
 	
 	button.setEnable = function()
-		button:GetNormalTexture():SetDesaturated(nil)
+		local tTexture = button:GetNormalTexture()
+		if(tTexture ~= nil and tTexture.SetDesaturated ~= nil) then tTexture:SetDesaturated(nil) end
 		button.state = true
 		return button
 	end
@@ -1087,6 +1100,7 @@ end
 -- MULTIBOT:ADD --
 
 MultiBot.addFrame = function(pName, pX, pY, pSize)
+	if(MultiBot.frames == nil) then MultiBot.frames = {} end
 	local tFrame = MultiBot.newFrame(MultiBot, pX, pY, pSize)
 	MultiBot.frames[pName] = tFrame
 	return tFrame
@@ -1115,6 +1129,7 @@ MultiBot.addPlayer = function(pClass, pName)
 	table.insert(MultiBot.index.players, pName)
 	tButton.roster = "players"
 	tButton.class = tClass
+	tButton.expanded = true
 	tButton.name = pName
 	return tButton
 end
@@ -1129,6 +1144,7 @@ MultiBot.addMember = function(pClass, pLevel, pName)
 	table.insert(MultiBot.index.members, pName)
 	tButton.roster = "members"
 	tButton.class = tClass
+	tButton.expanded = true
 	tButton.name = pName
 	return tButton
 end
@@ -1143,6 +1159,7 @@ MultiBot.addFriend = function(pClass, pLevel, pName)
 	table.insert(MultiBot.index.friends, pName)
 	tButton.roster = "friends"
 	tButton.class = tClass
+	tButton.expanded = true
 	tButton.name = pName
 	return tButton
 end
@@ -1154,6 +1171,7 @@ MultiBot.addActive = function(pClass, pLevel, pName)
 	local tButton = MultiBot.frames["MultiBar"].frames["Units"].addButton(pName, 0, 0, tTexture, MultiBot.toTip(tClass, pLevel, pName))
 	tButton.roster = "actives"
 	tButton.class = tClass
+	tButton.expanded = true
 	tButton.name = pName
 	return tButton
 end

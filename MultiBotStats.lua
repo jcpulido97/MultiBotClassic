@@ -43,7 +43,7 @@ MultiBot.addStats = function(pFrame, pIndex, pX, pY, pSize, pWidth, pHeight)
 			tFrame.texts["Level"]:SetText(pLevel)
 			tFrame.texts["Values"]:SetText("Player")
 			
-			if(pLevel == 80) then
+			if(pLevel == 60) then
 				tAddon.texts["Percent"]:SetText(tFrame.setProgress(tFrame, tMana) .. "%\n" .. MultiBot.info.shorts.mp)
 			else
 				tAddon.texts["Percent"]:SetText(tFrame.setProgress(tFrame, tXP) .. "%\n" .. MultiBot.info.shorts.xp)
@@ -61,7 +61,7 @@ MultiBot.addStats = function(pFrame, pIndex, pX, pY, pSize, pWidth, pHeight)
 		tFrame.texts["Level"]:SetText(pLevel)
 		tFrame.texts["Values"]:SetText(tMoney .. tBag)
 		
-		if(pLevel == 80) then
+		if(pLevel == 60) then
 			local tDur = MultiBot.doSplit(string.sub(MultiBot.doSplit(tStats[3], "|")[2], 10), " ")
 			local tQuality = tonumber(string.sub(tDur[1], 1, string.len(tDur[1]) - 1))
 			local tRepair = tonumber(string.sub(tDur[2], 2, string.len(tDur[2]) - 1))

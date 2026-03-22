@@ -3,24 +3,6 @@ MultiBot.data.talent = {}
 -- ARROWS --
 
 MultiBot.data.talent.arrows = {
-["DeathKnight"] = {
-[1] = {
-[1] = "7, 1, 4, Down_Arrow_Short",
-[2] = "8, 2, 4, Down",
-[3] = "8, 2, 5, Down_Arrow"
-},
-[2] = {
-[1] = "1, 1, 2, Down_Arrow",
-[2] = "7, 1, 4, Down",
-[3] = "7, 1, 5, Down_Arrow",
-},
-[3] = {
-[1] = "13, 4, 5, Down_Arrow",
-[2] = "18, 2, 7, Down_Arrow_Short",
-[3] = "20, 4, 7, Down_Arrow_Short",
-[4] = "25, 2, 9, Down_Arrow_Short"
-}
-},
 ["Druid"] = {
 [1] = {
 [1] = "4, 3, 2, Down_Left_Arrow",
