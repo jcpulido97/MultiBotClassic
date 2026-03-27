@@ -1,5 +1,5 @@
 # MultiBotClassic
-User interface addon for the AzerothCore module "Playerbot" by Liyunfan1223.<br>
+User interface addon for the vMangos module "ModPlayerbots"<br>
 Tested with the World of Warcraft Classic Era client version 1.14.2.
 # Installation
 Place the files in your World of Warcraft AddOns directory in a folder whose name matches the TOC file.<br>

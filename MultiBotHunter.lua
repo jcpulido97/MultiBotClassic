@@ -23,7 +23,7 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
-	tFrame.addButton("NonCombatMana", 0, 52, "ability_hunter_aspectoftheviper", MultiBot.tips.hunter.naspect.bmana)
+	tFrame.addButton("NonCombatMana", 0, 52, "spell_shadow_manaburn", MultiBot.tips.hunter.naspect.bmana)
 	.doLeft = function(pButton)
 		MultiBot.SelectToTarget(pButton.get(), "NonCombatAspect", pButton.texture, "nc +bmana,?", pButton.getName())
 		pButton.getButton("NonCombatAspect").doRight = function(pButton)
@@ -31,7 +31,7 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
-	tFrame.addButton("NonCombatDps", 0, 78, "ability_hunter_pet_dragonhawk", MultiBot.tips.hunter.naspect.bdps)
+	tFrame.addButton("NonCombatDps", 0, 78, "spell_nature_windfury", MultiBot.tips.hunter.naspect.bdps)
 	.doLeft = function(pButton)
 		MultiBot.SelectToTarget(pButton.get(), "NonCombatAspect", pButton.texture, "nc +bdps,?", pButton.getName())
 		pButton.getButton("NonCombatAspect").doRight = function(pButton)
@@ -50,11 +50,11 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 			MultiBot.OnOffActionToTarget(pButton, "nc +bspeed,?", "nc -bspeed,?", pButton.getName())
 		end
 	elseif(MultiBot.isInside(pNormal, "bmana")) then
-		tButton.setTexture("ability_hunter_aspectoftheviper").setEnable().doRight = function(pButton)
+		tButton.setTexture("spell_shadow_manaburn").setEnable().doRight = function(pButton)
 			MultiBot.OnOffActionToTarget(pButton, "nc +bmana,?", "nc -bmana,?", pButton.getName())
 		end
 	elseif(MultiBot.isInside(pNormal, "bdps")) then
-		tButton.setTexture("ability_hunter_pet_dragonhawk").setEnable().doRight = function(pButton)
+		tButton.setTexture("spell_nature_windfury").setEnable().doRight = function(pButton)
 			MultiBot.OnOffActionToTarget(pButton, "nc +bdps,?", "nc -bdps,?", pButton.getName())
 		end
 	end
@@ -85,7 +85,7 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
-	tFrame.addButton("CombatMana", 0, 52, "ability_hunter_aspectoftheviper", MultiBot.tips.hunter.caspect.bmana)
+	tFrame.addButton("CombatMana", 0, 52, "spell_shadow_manaburn", MultiBot.tips.hunter.caspect.bmana)
 	.doLeft = function(pButton)
 		MultiBot.SelectToTarget(pButton.get(), "CombatAspect", pButton.texture, "co +bmana,?", pButton.getName())
 		pButton.getButton("CombatAspect").doRight = function(pButton)
@@ -93,7 +93,7 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 		end
 	end
 	
-	tFrame.addButton("CombatDps", 0, 78, "ability_hunter_pet_dragonhawk", MultiBot.tips.hunter.caspect.bdps)
+	tFrame.addButton("CombatDps", 0, 78, "spell_nature_windfury", MultiBot.tips.hunter.caspect.bdps)
 	.doLeft = function(pButton)
 		MultiBot.SelectToTarget(pButton.get(), "CombatAspect", pButton.texture, "co +bdps,?", pButton.getName())
 		pButton.getButton("CombatAspect").doRight = function(pButton)
@@ -112,11 +112,11 @@ MultiBot.addHunter = function(pFrame, pCombat, pNormal)
 			MultiBot.OnOffActionToTarget(pButton, "co +bspeed,?", "co -bspeed,?", pButton.getName())
 		end
 	elseif(MultiBot.isInside(pCombat, "bmana")) then
-		tButton.setTexture("ability_hunter_aspectoftheviper").setEnable().doRight = function(pButton)
+		tButton.setTexture("spell_shadow_manaburn").setEnable().doRight = function(pButton)
 			MultiBot.OnOffActionToTarget(pButton, "co +bmana,?", "co -bmana,?", pButton.getName())
 		end
 	elseif(MultiBot.isInside(pCombat, "bdps")) then
-		tButton.setTexture("ability_hunter_pet_dragonhawk").setEnable().doRight = function(pButton)
+		tButton.setTexture("spell_nature_windfury").setEnable().doRight = function(pButton)
 			MultiBot.OnOffActionToTarget(pButton, "co +bdps,?", "co -bdps,?", pButton.getName())
 		end
 	end

@@ -963,6 +963,22 @@ MultiBot.createUnitsFrame = function()
 	tFrame.pageSize = 10
 
 	tFrame.movButton("Move", -484, 366, 34, MultiBot.tips.move.raidus)
+	tFrame.addText("Title", "|cffffcc00Unit Control|r  |cff999999(Right-Click and drag here)|r", "TOP", 0, -10, 12)
+
+	local tTitleBar = CreateFrame("Button", nil, tFrame)
+	tTitleBar:SetPoint("TOPLEFT", 8, -4)
+	tTitleBar:SetPoint("TOPRIGHT", -24, -4)
+	tTitleBar:SetHeight(20)
+	tTitleBar:EnableMouse(true)
+	tTitleBar:RegisterForClicks("RightButtonDown")
+	tTitleBar:RegisterForDrag("RightButton")
+	tTitleBar:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+	tTitleBar:SetScript("OnDragStart", function()
+		tFrame:StartMoving()
+	end)
+	tTitleBar:SetScript("OnDragStop", function()
+		tFrame:StopMovingOrSizing()
+	end)
 
 	tFrame.wowButton("x", -2, 374, 16, 20, 12)
 	.doLeft = function(pButton)

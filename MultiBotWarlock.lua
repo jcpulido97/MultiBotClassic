@@ -108,10 +108,10 @@ MultiBot.addWarlock = function(pFrame, pCombat, pNormal)
 
 	-- STRATEGIES --
 
-	if(MultiBot.isInside(pCombat, "dps")) then pFrame.getButton("Dps").setEnable() end
+	if(MultiBot.isInside(pCombat, "dps,")) then pFrame.getButton("Dps").setEnable() end
 	if(MultiBot.isInside(pCombat, "dps aoe")) then pFrame.getButton("DpsAoe").setEnable() end
 	if(MultiBot.isInside(pCombat, "dps debuff")) then pFrame.getButton("DpsDebuff").setEnable() end
 	if(MultiBot.isInside(pCombat, "dps assist")) then pFrame.getButton("DpsAssist").setEnable() end
 	if(MultiBot.isInside(pCombat, "tank assist")) then pFrame.getButton("TankAssist").setEnable() end
-	if(MultiBot.isInside(pCombat, "tank")) then pFrame.getButton("Tank").setEnable() end
+	if(MultiBot.isInside(pCombat, "tank,")) then pFrame.getButton("Tank").setEnable() end
 end
