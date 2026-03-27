@@ -528,82 +528,6 @@ tButton.doRight = function(pButton)
 	pButton.doLeft(pButton, pButton.roster, pButton.filter)
 end
 
-MultiBot.renderUnits = function(pButton, oResetPage)
-	local tUnits = pButton.parent.frames["Units"]
-	local tTable = nil
-	local tIsActives = pButton.roster == "actives"
-	
-	for key, value in pairs(tUnits.buttons) do value:Hide() end
-	for key, value in pairs(tUnits.frames) do value:Hide() end
-	tUnits.frames["Alliance"]:Show()
-	tUnits.frames["Control"]:Show()
-	
-	if(tIsActives and MultiBot.GetOrderedActives ~= nil)
-	then tTable = MultiBot.GetOrderedActives(pButton.filter)
-	elseif(pButton.filter ~= "none")
-	then tTable = MultiBot.index.classes[pButton.roster][pButton.filter]
-	else tTable = MultiBot.index[pButton.roster]
-	end
-	
-	local tButton = nil
-	local tFrame = nil
-	local tIndex = 0
-	local tVisible = 0
-	local tPageSize = MultiBot.IF(pButton.pageSize ~= nil, pButton.pageSize, 10)
-	
-	if(tTable ~= nil)
-	then pButton.limit = table.getn(tTable)
-	else pButton.limit = 0
-	end
-	
-	if(tIsActives and MultiBot.ClampActivePage ~= nil) then
-		if(oResetPage and MultiBot.unitControl ~= nil and MultiBot.unitControl.actives ~= nil) then
-			MultiBot.unitControl.actives.pageStart = 1
-		end
-		pButton.from = MultiBot.ClampActivePage()
-	elseif(oResetPage or pButton.from == nil or pButton.from < 1) then
-		pButton.from = 1
-	end
-	
-	if(pButton.limit <= 0) then
-		pButton.from = 1
-		pButton.to = 0
-	else
-		if(pButton.from > pButton.limit) then
-			pButton.from = pButton.limit - tPageSize + 1
-			if(pButton.from < 1) then pButton.from = 1 end
-		end
-		
-		pButton.to = pButton.from + tPageSize - 1
-		if(pButton.to > pButton.limit) then pButton.to = pButton.limit end
-	end
-
-	if(tIsActives and MultiBot.unitControl ~= nil and MultiBot.unitControl.actives ~= nil) then
-		MultiBot.unitControl.actives.pageStart = pButton.from
-	end
-	
-	for i = pButton.from, pButton.to do
-		tVisible = tVisible + 1
-		tIndex = tVisible
-		tFrame = tUnits.frames[tTable[i]]
-		tButton = tUnits.buttons[tTable[i]]
-		tButton.setPoint(0, (tUnits.size + 2) * (tIndex - 1))
-		if(tFrame ~=nil) then tFrame.setPoint(-64, (tUnits.size + 2) * (tIndex - 1) + 2) end
-
-		if(tFrame ~= nil and tButton.state) then
-			tFrame:Show()
-		end
-		tButton:Show()
-	end
-	
-	tUnits.frames["Control"].setPoint(-2, (tUnits.size + 2) * tVisible)
-	
-	if(pButton.limit <= tPageSize)
-	then tUnits.frames["Control"].buttons["Browse"]:Hide()
-	else tUnits.frames["Control"].buttons["Browse"]:Show()
-	end
-end
-
 tButton.doLeft = function(pButton, oRoster, oFilter)
 	local tUnits = pButton.parent.frames["Units"]
 	local tResetPage = false
@@ -621,8 +545,6 @@ tButton.doLeft = function(pButton, oRoster, oFilter)
 			tResetPage = true
 		end
 	end
-	
-	MultiBot.renderUnits(pButton, tResetPage)
 end
 
 local tUnits = tMultiBar.addFrame("Units", -40, 72)
@@ -636,9 +558,11 @@ tAlliance:Show()
 local tButton = tAlliance.addButton("Alliance", 0, 0, "Icons\\roster_players.blp", MultiBot.tips.units.alliance).doShow()
 tButton.doRight = function(pButton)
 	SendChatMessage(".playerbot bot remove *", "SAY");
+	MultiBot.destroyUnitsFrame()
 end
 tButton.doLeft = function(pButton)
 	SendChatMessage(".playerbot bot add *", "SAY");
+	MultiBot.createUnitsFrame()
 end
 
 -- UNITS:CONTROL --
@@ -855,36 +779,258 @@ tInvite.addButton("Raid+40", 108, 0, "Interface\\AddOns\\MultiBot\\Icons\\invite
 	SendChatMessage(MultiBot.info.starting, "SAY")
 end
 
-local tBrowse = tControl.addButton("Browse", 0, 90, "Interface\\AddOns\\MultiBot\\Icons\\browse.blp", MultiBot.tips.units.browse)
-tBrowse.doLeft = function(pButton)
-	local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-	local tPageSize = MultiBot.IF(tMaster.pageSize ~= nil, tMaster.pageSize, 10)
-	if(tMaster.roster == "actives" and MultiBot.unitControl ~= nil and MultiBot.unitControl.actives ~= nil) then
-		local tFrom = MultiBot.unitControl.actives.pageStart + tPageSize
-		if(tFrom > tMaster.limit) then tFrom = 1 end
-		MultiBot.unitControl.actives.pageStart = tFrom
-		tMaster.from = tFrom
-	else
-		local tFrom = tMaster.from + tPageSize
-		if(tFrom > tMaster.limit) then tFrom = 1 end
-		tMaster.from = tFrom
-	end
-	MultiBot.renderUnits(tMaster, false)
+-- STANDALONE UNITS FRAME --
+
+MultiBot.destroyUnitsFrame = function()
+	if(MultiBot.unitsFrame == nil) then return end
+	for key, value in pairs(MultiBot.unitsFrame.frames) do value:Hide() end
+	for key, value in pairs(MultiBot.unitsFrame.buttons) do value:Hide() end
+	MultiBot.unitsFrame:Hide()
+	MultiBot.unitsFrame = nil
 end
-tBrowse.doRight = function(pButton)
-	local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-	local tPageSize = MultiBot.IF(tMaster.pageSize ~= nil, tMaster.pageSize, 10)
-	if(tMaster.roster == "actives" and MultiBot.unitControl ~= nil and MultiBot.unitControl.actives ~= nil) then
-		local tFrom = MultiBot.unitControl.actives.pageStart - tPageSize
-		if(tFrom < 1) then tFrom = math.max(1, tMaster.limit - tPageSize + 1) end
-		MultiBot.unitControl.actives.pageStart = tFrom
-		tMaster.from = tFrom
-	else
-		local tFrom = tMaster.from - tPageSize
-		if(tFrom < 1) then tFrom = math.max(1, tMaster.limit - tPageSize + 1) end
-		tMaster.from = tFrom
+
+MultiBot.addUnitRow = function(pName, pClass, pCombat, pNormal)
+	if(MultiBot.unitsFrame == nil) then return end
+	local tRows = MultiBot.unitsFrame.frames["Rows"]
+	if(tRows.frames[pName] ~= nil and pCombat == nil) then return end
+
+	if(tRows.frames[pName] ~= nil) then
+		tRows.frames[pName]:Hide()
+		tRows.frames[pName] = nil
 	end
-	MultiBot.renderUnits(tMaster, false)
+
+	local tRow = tRows.addFrame(pName, 0, 0, 28)
+	tRow.class = pClass
+	tRow.name = pName
+
+	local tClassTexture = "Interface\\AddOns\\MultiBot\\Icons\\class_" .. string.lower(pClass) .. ".blp"
+	tRow.addButton("ClassIcon", 30, -2, tClassTexture, nil)
+
+	tRow.addButton("Attack", 60, 0, "Interface\\AddOns\\MultiBot\\Icons\\attack.blp", MultiBot.tips.attack.master)
+	.doLeft = function(pButton)
+		SendChatMessage("do attack my target", "WHISPER", nil, pName)
+	end
+
+	if(pCombat ~= nil and pNormal ~= nil) then
+		MultiBot["add" .. pClass](tRow, pCombat, pNormal)
+		tRow.nextX = -210
+		MultiBot.addEvery(tRow, pCombat, pNormal)
+
+		if(pName ~= UnitName("player")) then
+			local tInvBtn = tRow.getButton("Inventory")
+			if(tInvBtn ~= nil) then
+				tInvBtn.doLeft = function(pButton)
+					if(pButton.state) then
+						MultiBot.inventory:Hide()
+						pButton.setDisable()
+					else
+						local tRowsFrame = MultiBot.unitsFrame.frames["Rows"]
+						for key, value in pairs(tRowsFrame.frames) do
+							local tBtn = value.getButton("Inventory")
+							if(tBtn ~= nil) then tBtn.setDisable() end
+						end
+						pButton.setEnable()
+						MultiBot.inventory.name = pName
+						local tUnits = MultiBot.frames["MultiBar"].frames["Units"]
+						tUnits.buttons[pName].waitFor = "INVENTORY"
+						SendChatMessage("items", "WHISPER", nil, pName)
+					end
+				end
+			end
+
+			local tSpellBtn = tRow.getButton("Spellbook")
+			if(tSpellBtn ~= nil) then
+				tSpellBtn.doLeft = function(pButton)
+					if(pButton.state) then
+						MultiBot.spellbook:Hide()
+						pButton.setDisable()
+					else
+						local tRowsFrame = MultiBot.unitsFrame.frames["Rows"]
+						for key, value in pairs(tRowsFrame.frames) do
+							local tBtn = value.getButton("Spellbook")
+							if(tBtn ~= nil) then tBtn.setDisable() end
+						end
+						pButton.setEnable()
+						MultiBot.spellbook.name = pName
+						local tUnits = MultiBot.frames["MultiBar"].frames["Units"]
+						tUnits.buttons[pName].waitFor = "SPELLBOOK"
+						SendChatMessage("spells", "WHISPER", nil, pName)
+					end
+				end
+			end
+		end
+	else
+		local tX = -30
+		tRow.addButton("Summon", tX, 0, "ability_hunter_beastcall", MultiBot.tips.every.summon)
+		.doLeft = function(pButton)
+			MultiBot.ActionToTarget("summon", pName)
+		end
+	end
+
+	local tClassBtn = tRow.buttons["ClassIcon"]
+	if(tClassBtn ~= nil) then
+		tClassBtn.tip = pName
+		tClassBtn.addMacro("type1", "/target " .. pName)
+	end
+
+	MultiBot.refreshUnitsFrame()
+end
+
+MultiBot.refreshUnitsFrame = function()
+	if(MultiBot.unitsFrame == nil) then return end
+	local tRows = MultiBot.unitsFrame.frames["Rows"]
+	local tTable = MultiBot.GetOrderedActives("none")
+	local tPageSize = MultiBot.unitsFrame.pageSize
+	local tLimit = 0
+	local tRowOffset = -65
+
+	if(tTable ~= nil) then tLimit = table.getn(tTable) end
+
+	for key, value in pairs(tRows.frames) do value:Hide() end
+
+	if(tLimit <= 0) then
+		MultiBot.unitsFrame.pageStart = 1
+		MultiBot.unitsFrame.frames["Control"].setPoint(-2, 0)
+		MultiBot.unitsFrame.frames["Control"].buttons["Browse"]:Hide()
+		return
+	end
+
+	if(MultiBot.unitsFrame.pageStart > tLimit) then
+		MultiBot.unitsFrame.pageStart = tLimit - tPageSize + 1
+		if(MultiBot.unitsFrame.pageStart < 1) then MultiBot.unitsFrame.pageStart = 1 end
+	end
+
+	local tFrom = MultiBot.unitsFrame.pageStart
+	local tTo = tFrom + tPageSize - 1
+	if(tTo > tLimit) then tTo = tLimit end
+
+	local tVisible = 0
+	for i = tFrom, tTo do
+		local tName = tTable[i]
+		tVisible = tVisible + 1
+
+		if(tRows.frames[tName] == nil) then
+			local tUnits = MultiBot.frames["MultiBar"].frames["Units"]
+			local tButton = tUnits.buttons[tName]
+			if(tButton ~= nil) then
+				local tCombat = tButton.combat
+				local tNormal = tButton.normal
+				MultiBot.addUnitRow(tName, tButton.class, tCombat, tNormal)
+			end
+		end
+
+		if(tRows.frames[tName] ~= nil) then
+			tRows.frames[tName].setPoint(tRowOffset, (30) * (tVisible - 1) + 20)
+			tRows.frames[tName]:Show()
+		end
+	end
+
+	MultiBot.unitsFrame.frames["Control"].setPoint(-2, (30) * tVisible + 20)
+
+	if(tLimit <= tPageSize)
+	then MultiBot.unitsFrame.frames["Control"].buttons["Browse"]:Hide()
+	else MultiBot.unitsFrame.frames["Control"].buttons["Browse"]:Show()
+	end
+
+	for key, value in pairs(tRows.frames) do
+		local tFound = false
+		if(tTable ~= nil) then
+			for i = 1, table.getn(tTable) do
+				if(tTable[i] == key) then tFound = true end
+			end
+		end
+		if(not tFound) then
+			value:Hide()
+			tRows.frames[key] = nil
+		end
+	end
+end
+
+MultiBot.createUnitsFrame = function()
+	if(MultiBot.unitsFrame ~= nil) then MultiBot.destroyUnitsFrame() end
+
+	local tFrame = MultiBot.newFrame(MultiBot, -340, -126, 28, 520, 400)
+	tFrame:SetMovable(true)
+	tFrame:SetResizable(true)
+	tFrame:SetMinResize(520, 120)
+	tFrame:SetMaxResize(520, 900)
+	tFrame:SetFrameStrata("DIALOG")
+	tFrame.addTexture("Textures\\Black.blp")
+	tFrame:Hide()
+
+	MultiBot.unitsFrame = tFrame
+	tFrame.pageStart = 1
+	tFrame.pageSize = 10
+
+	tFrame.movButton("Move", -484, 366, 34, MultiBot.tips.move.raidus)
+
+	tFrame.wowButton("x", -2, 374, 16, 20, 12)
+	.doLeft = function(pButton)
+		MultiBot.destroyUnitsFrame()
+	end
+
+	tFrame.addFrame("Rows", 0, 0, 28, 520, 340)
+
+	local tControl = tFrame.addFrame("Control", -2, 0)
+	tControl:Show()
+
+	local tBrowse = tControl.addButton("Browse", 0, 0, "Interface\\AddOns\\MultiBot\\Icons\\browse.blp", MultiBot.tips.units.browse)
+	tBrowse.doLeft = function(pButton)
+		local tPageSize = MultiBot.unitsFrame.pageSize
+		local tTable = MultiBot.GetOrderedActives("none")
+		local tLimit = MultiBot.IF(tTable ~= nil, table.getn(tTable), 0)
+		local tFrom = MultiBot.unitsFrame.pageStart + tPageSize
+		if(tFrom > tLimit) then tFrom = 1 end
+		MultiBot.unitsFrame.pageStart = tFrom
+		MultiBot.refreshUnitsFrame()
+	end
+	tBrowse.doRight = function(pButton)
+		local tPageSize = MultiBot.unitsFrame.pageSize
+		local tTable = MultiBot.GetOrderedActives("none")
+		local tLimit = MultiBot.IF(tTable ~= nil, table.getn(tTable), 0)
+		local tFrom = MultiBot.unitsFrame.pageStart - tPageSize
+		if(tFrom < 1) then tFrom = math.max(1, tLimit - tPageSize + 1) end
+		MultiBot.unitsFrame.pageStart = tFrom
+		MultiBot.refreshUnitsFrame()
+	end
+
+	local tResize = CreateFrame("Button", nil, tFrame)
+	tResize:SetPoint("BOTTOMRIGHT", 0, 0)
+	tResize:SetSize(16, 16)
+	tResize:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	tResize:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	tResize:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	tResize:SetScript("OnMouseDown", function()
+		tFrame:StartSizing("BOTTOMRIGHT")
+	end)
+	tResize:SetScript("OnMouseUp", function()
+		tFrame:StopMovingOrSizing()
+		local tHeight = tFrame:GetHeight()
+		local tRowsHeight = tHeight - 60
+		if(tRowsHeight < 30) then tRowsHeight = 30 end
+		MultiBot.unitsFrame.pageSize = math.floor(tRowsHeight / 30)
+		MultiBot.unitsFrame.frames["Rows"]:SetSize(520, tRowsHeight)
+		MultiBot.refreshUnitsFrame()
+	end)
+
+	tFrame:SetScript("OnSizeChanged", function(pSelf, pWidth, pHeight)
+		tFrame.buttons["Move"]:SetPoint("BOTTOMRIGHT", -484, pHeight - 34)
+		tFrame.buttons["x"]:SetPoint("BOTTOMRIGHT", -2, pHeight - 26)
+	end)
+
+	local tTable = MultiBot.GetOrderedActives("none")
+	if(tTable ~= nil) then
+		local tUnits = MultiBot.frames["MultiBar"].frames["Units"]
+		for i = 1, table.getn(tTable) do
+			local tName = tTable[i]
+			local tButton = tUnits.buttons[tName]
+			if(tButton ~= nil) then
+				MultiBot.addUnitRow(tName, tButton.class, tButton.combat, tButton.normal)
+			end
+		end
+	end
+
+	tFrame:Show()
 end
 
 -- MAIN --
@@ -2026,7 +2172,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R02", "|cff402000Rank|r", "TOPLEFT", 172, -16, 11)
@@ -2036,7 +2182,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R03", "|cff402000Rank|r", "TOPLEFT", 44, -52, 11)
@@ -2046,7 +2192,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R04", "|cff402000Rank|r", "TOPLEFT", 172, -52, 11)
@@ -2056,7 +2202,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R05", "|cff402000Rank|r", "TOPLEFT", 44, -88, 11)
@@ -2066,7 +2212,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R06", "|cff402000Rank|r", "TOPLEFT", 172, -88, 11)
@@ -2076,7 +2222,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R07", "|cff402000Rank|r", "TOPLEFT", 44, -124, 11)
@@ -2086,7 +2232,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R08", "|cff402000Rank|r", "TOPLEFT", 172, -124, 11)
@@ -2096,7 +2242,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R09", "|cff402000Rank|r", "TOPLEFT", 44, -160, 11)
@@ -2106,7 +2252,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R10", "|cff402000Rank|r", "TOPLEFT", 172, -160, 11)
@@ -2116,7 +2262,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R11", "|cff402000Rank|r", "TOPLEFT", 44, -196, 11)
@@ -2126,7 +2272,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R12", "|cff402000Rank|r", "TOPLEFT", 172, -196, 11)
@@ -2136,7 +2282,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R13", "|cff402000Rank|r", "TOPLEFT", 44, -232, 11)
@@ -2146,7 +2292,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R14", "|cff402000Rank|r", "TOPLEFT", 172, -232, 11)
@@ -2156,7 +2302,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R15", "|cff402000Rank|r", "TOPLEFT", 44, -268, 11)
@@ -2166,7 +2312,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.addText("R16", "|cff402000Rank|r", "TOPLEFT", 172, -268, 11)
@@ -2176,7 +2322,7 @@ tButton.doRight = function(pButton)
 	MultiBot.SpellToMacro(MultiBot.spellbook.name, pButton.spell, pButton.texture)
 end
 tButton.doLeft = function(pButton)
-	SendChatMessage("cast " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
+	SendChatMessage("castid " .. pButton.spell, "WHISPER", nil, MultiBot.spellbook.name)
 end
 
 tOverlay.boxButton("C01", -214, 262, 16, true)

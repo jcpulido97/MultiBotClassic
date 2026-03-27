@@ -101,7 +101,7 @@ function MultiBot.SetUnitCollapsed(pName, pCollapsed)
 	if(tButton ~= nil) then tButton.expanded = not pCollapsed end
 
 	if(tFrame ~= nil) then
-		if(pCollapsed or (tButton ~= nil and tButton.state == false)) then
+		if(pCollapsed or (tButton ~= nil and tButton.state == false) or MultiBot.unitsFrame ~= nil) then
 			tFrame:Hide()
 		else
 			tFrame:Show()
@@ -241,9 +241,8 @@ local function MultiBotRefreshGroupRoster()
 	tActives.order = tOrder
 	MultiBot.ClampActivePage()
 
-	local tUnits = MultiBot.frames["MultiBar"].buttons["Units"]
-	if(tUnits.roster == "actives") then
-		MultiBot.renderUnits(tUnits, false)
+	if(MultiBot.unitsFrame ~= nil and MultiBot.refreshUnitsFrame ~= nil) then
+		MultiBot.refreshUnitsFrame()
 	end
 end
 
@@ -821,11 +820,6 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 				SendChatMessage("co ?", "WHISPER", nil, tName)
 				tButton.setEnable()
 
-				local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-				if(tMaster.roster == "actives") then
-					MultiBot.renderUnits(tMaster, false)
-				end
-
 				return
 			end
 			
@@ -848,9 +842,6 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 			MultiBot.CollapseUnitButton(tButton)
 			tButton.setDisable()
 			MultiBot.ClampActivePage()
-			if(MultiBot.frames["MultiBar"].buttons["Units"].roster == "actives") then
-				MultiBot.renderUnits(MultiBot.frames["MultiBar"].buttons["Units"], false)
-			end
 			--MultiBot.doRaid()
 			return
 		end
@@ -864,11 +855,6 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 			SendChatMessage("co ?", "WHISPER", nil, tName)
 			tButton.setEnable()
 
-			local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-			if(tMaster.roster == "actives") then
-				MultiBot.renderUnits(tMaster, false)
-			end
-
 			return
 		end
 
@@ -880,11 +866,6 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 			if(tFrame ~= nil) then tFrame:Hide() end
 			MultiBot.CollapseUnitButton(tButton)
 			tButton.setDisable()
-
-			local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-			if(tMaster.roster == "actives") then
-				MultiBot.renderUnits(tMaster, false)
-			end
 
 			return
 		end
@@ -1006,20 +987,6 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 			SendChatMessage(MultiBot.doReplace(MultiBot.info.combat, "NAME", arg2), "SAY")
 			SendChatMessage("co ?", "WHISPER", nil, arg2)
 
-			local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-			if(tMaster.roster == "actives") then
-				MultiBot.renderUnits(tMaster, false)
-			end
-
-			return
-		end
-
-		if(MultiBot.isInside(arg1, "Goodbye", "再见")) then
-			local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-			if(tMaster.roster == "actives") then
-				MultiBot.renderUnits(tMaster, false)
-			end
-
 			return
 		end
 		
@@ -1069,16 +1036,15 @@ MultiBot:SetScript("OnEvent", function(_, event, ...)
 			
 			MultiBot["add" .. tButton.class](tFrame, tButton.combat, tButton.normal)
 			MultiBot.addEvery(tFrame, tButton.combat, tButton.normal)
-			
+
+			if(MultiBot.unitsFrame ~= nil and MultiBot.addUnitRow ~= nil) then
+				MultiBot.addUnitRow(arg2, tButton.class, tButton.combat, tButton.normal)
+			end
+
 			MultiBotSyncActiveClassIndex(tButton)
 			
 			tButton.setEnable()
 			MultiBot.ApplyUnitCollapsed(tButton.name)
-
-			local tMaster = MultiBot.frames["MultiBar"].buttons["Units"]
-			if(tMaster.roster == "actives") then
-				MultiBot.renderUnits(tMaster, false)
-			end
 
 			SendChatMessage("ss ?", "WHISPER", nil, arg2)
 			return

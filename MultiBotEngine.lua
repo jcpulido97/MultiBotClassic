@@ -377,7 +377,7 @@ MultiBot.SpellToMacro = function(pName, pSpell, pTexture)
 	local tMacro = string.sub(pName, 1, 14) .. tAmount
 	local tSpell, tIcon, tBody = GetMacroInfo(tMacro)
 	
-	if(tSpell == nil) then CreateMacro(tMacro, MultiBot.spellbook.icons[pTexture], "/t " .. pName .. " cast " .. pSpell, true) end
+	if(tSpell == nil) then CreateMacro(tMacro, MultiBot.spellbook.icons[pTexture], "/t " .. pName .. " castid " .. pSpell, true) end
 	PickupMacro(tMacro)
 end
 
@@ -1116,6 +1116,7 @@ MultiBot.addSelf = function(pClass, pName)
 	tButton.roster = "players"
 	tButton.class = tClass
 	tButton.name = pName
+	tButton:Hide()
 	return tButton
 end
 
@@ -1131,6 +1132,7 @@ MultiBot.addPlayer = function(pClass, pName)
 	tButton.class = tClass
 	tButton.expanded = true
 	tButton.name = pName
+	tButton:Hide()
 	return tButton
 end
 
@@ -1146,6 +1148,7 @@ MultiBot.addMember = function(pClass, pLevel, pName)
 	tButton.class = tClass
 	tButton.expanded = true
 	tButton.name = pName
+	tButton:Hide()
 	return tButton
 end
 
@@ -1161,6 +1164,7 @@ MultiBot.addFriend = function(pClass, pLevel, pName)
 	tButton.class = tClass
 	tButton.expanded = true
 	tButton.name = pName
+	tButton:Hide()
 	return tButton
 end
 
@@ -1173,6 +1177,7 @@ MultiBot.addActive = function(pClass, pLevel, pName)
 	tButton.class = tClass
 	tButton.expanded = true
 	tButton.name = pName
+	tButton:Hide()
 	return tButton
 end
 

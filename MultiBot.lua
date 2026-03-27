@@ -840,22 +840,8 @@ MultiBot.tips.creator.init =
 -- UNIT --
 
 MultiBot.tips.unit = {}
-MultiBot.tips.unit.selfbot =
-"Selfbot\n"..
-"|cffffffffThis Button switches the Selfbot-Mode on and off.|r\n\n"..
-"|cffff0000Left-Click to execute Selfbot|r\n"..
-"|cff999999(Execution-Order: System)|r";
-
-MultiBot.tips.unit.button =
-"|cffffffff\n"..
-"This Button adds or removes NAME to or from your Group.\n"..
-"MultiBot will ask Playerbot about the Combat- and Non-Combat-Strategies.\n"..
-"The Strategies can be configured with the Buttonbars on the left and right side.\n"..
-"The Buttonbars will appear after adding the Bot.|r\n\n"..
-"|cffff0000Left-Click to add NAME|r\n"..
-"|cff999999(Execution-Order: System)|r\n\n"..
-"|cffff0000Right-Click to remove NAME|r\n"..
-"|cff999999(Execution-Order: System)|r";
+MultiBot.tips.unit.selfbot = "";
+MultiBot.tips.unit.button = "";
 
 -- UNITS --
 
