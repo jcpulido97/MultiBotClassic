@@ -1,6 +1,6 @@
-# MultiBot
-User interface for AzerothCore-Module "Playerbot" by Liyunfan1223.<br>
-Tested with American and German 3.3.5 Wotlk-Client.
+# MultiBotClassic
+User interface addon for the AzerothCore module "Playerbot" by Liyunfan1223.<br>
+Tested with the World of Warcraft Classic Era client version 1.14.2.
 # Installation
 Place the files in your World of Warcraft AddOns directory in a folder whose name matches the TOC file.<br>
 For this package, keep the folder name as "MultiBotClassic" so WoW can detect "MultiBotClassic.toc".<br>
@@ -12,7 +12,7 @@ Start World of Warcraft and enter "/multibot" or "/mbot" or "/mb" in the chat.
   <tr>
     <td><img src="https://github.com/Macx-Lio/MultiBot/blob/main/Screenshots/Handout-00-Start.png"></td>
     <td>
-      This Picture shows the default MultiBot-Interface after start.
+      This Picture shows the default MultiBotClassic interface after start.
     </td>
   </tr>
   <tr>
@@ -260,7 +260,7 @@ Start World of Warcraft and enter "/multibot" or "/mbot" or "/mb" in the chat.
   <tr>
     <td><img src="https://github.com/Macx-Lio/MultiBot/blob/main/Screenshots/Handout-09-Control.png"></td>
     <td>
-      This is the MultiBot-Control.
+      This is the MultiBotClassic control.
       A left click on the Button will show and hide the Controls.
       Here you will find the "reset", "reset botAI" and "naxx"-Commands for your Bots.
       These Buttons works with Target, Group and Raid.
